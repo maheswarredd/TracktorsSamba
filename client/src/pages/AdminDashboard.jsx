@@ -52,7 +52,13 @@ export const AdminDashboard = () => {
   const [ticketRefundStatus, setTicketRefundStatus] = useState('APPROVED');
 
   // New Rider / Tractor form state
-  const [newRider, setNewRider] = useState({ name: '', email: '', phone: '', village: '' });
+  const [newRider, setNewRider] = useState({
+  name: '',
+  email: '',
+  phone: '',
+  village: '',
+  password: ''
+});
   const [newTractor, setNewTractor] = useState({ name: '', registrationNumber: '', hp: 60 });
 
   // Settings State
@@ -156,7 +162,13 @@ export const AdminDashboard = () => {
     try {
       await api.createRider(newRider);
       alert('Rider registered successfully!');
-      setNewRider({ name: '', email: '', phone: '', village: '' });
+      setNewRider({
+      name: '',
+      email: '',
+      phone: '',
+      village: '',
+      password: ''
+      });
       loadAllAdminData();
     } catch (err) {
       alert(err.message);
@@ -673,13 +685,27 @@ export const AdminDashboard = () => {
                   className="p-2 border rounded-xl"
                 />
                 <input
-                  type="text"
-                  placeholder="Village"
-                  value={newRider.village}
-                  onChange={(e) => setNewRider({ ...newRider, village: e.target.value })}
-                  className="p-2 border rounded-xl"
-                />
-              </div>
+  type="text"
+  placeholder="Village"
+  value={newRider.village}
+  onChange={(e) => setNewRider({ ...newRider, village: e.target.value })}
+  className="p-2 border rounded-xl"
+/>
+
+{/* Rider Password */}
+<input
+  type="password"
+  placeholder="Rider Password (minimum 12 characters)"
+  required
+  minLength={12}
+  autoComplete="new-password"
+  value={newRider.password}
+  onChange={(e) =>
+    setNewRider({ ...newRider, password: e.target.value })
+  }
+  className="p-2 border rounded-xl"
+/>
+</div>
               <button type="submit" className="w-full bg-emerald-600 text-white font-bold py-2 rounded-xl">
                 Register Pilot
               </button>
