@@ -285,6 +285,20 @@ export const getAdminResources = async (req, res) => {
 export const createRider = async (req, res) => {
   try {
     const { name, email, phone, password, village, assignedTractor } = req.body;
+
+if (!name || !email || !phone || !password) {
+  return res.status(400).json({
+    success: false,
+    message: 'Name, email, phone and password are required'
+  });
+}
+
+if (password.length < 12) {
+  return res.status(400).json({
+    success: false,
+    message: 'Password must be at least 12 characters'
+  });
+}
     const existing = await User.findOne({ email });
     if (existing) {
       return res.status(400).json({ success: false, message: 'Email already exists' });
@@ -294,7 +308,7 @@ export const createRider = async (req, res) => {
       name,
       email: email.toLowerCase(),
       phone,
-      password: password || 'password123',
+      password,
       role: 'rider',
       village: village || '',
       assignedTractor: assignedTractor || null
