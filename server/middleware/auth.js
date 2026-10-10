@@ -7,7 +7,14 @@ export const protect = async (req, res, next) => {
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
       token = req.headers.authorization.split(' ')[1];
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || 'samba_tractors_super_secret_jwt_key_2026');
+      if (!process.env.JWT_SECRET) {
+  return res.status(500).json({
+    success: false,
+    message: 'Server authentication is not configured'
+  });
+}
+
+const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.user = await User.findById(decoded.id).select('-password');
       if (!req.user) {
         return res.status(401).json({ success: false, message: 'User not found with this token' });
