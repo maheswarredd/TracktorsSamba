@@ -724,22 +724,43 @@ export const seedDatabase = async () => {
     }
     console.log(`Seeded ${initialServices.length} exact services.`);
 
-    // 2. Seed Default Admin
-    const adminEmail = 'admin@sambatractors.com';
-    let admin = await User.findOne({ email: adminEmail });
-    if (!admin) {
-      admin = new User({
-        name: 'Samba Admin',
-        email: adminEmail,
-        phone: '9848012345',
-        password: 'password123',
-        role: 'admin',
-        language: 'te',
-        village: 'Samba Central Hub'
-      });
-      await admin.save();
-      console.log('Created default admin: admin@sambatractors.com / password123');
-    }
+    // 2. Create or update Admin from Render Environment Variables
+const adminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+const adminPassword = process.env.ADMIN_PASSWORD;
+
+if (!adminEmail || !adminPassword || !process.env.JWT_SECRET) {
+  throw new Error(
+    'ADMIN_EMAIL, ADMIN_PASSWORD and JWT_SECRET must be configured'
+  );
+}
+
+let admin = await User.findOne({ email: adminEmail });
+
+if (admin && admin.role !== 'admin') {
+  throw new Error(
+    'ADMIN_EMAIL already belongs to a non-admin account'
+  );
+}
+
+if (!admin) {
+  admin = new User({
+    name: process.env.ADMIN_NAME || 'Samba Admin',
+    email: adminEmail,
+    phone: process.env.ADMIN_PHONE,
+    password: adminPassword,
+    role: 'admin',
+    language: 'te',
+    village: 'Samba Central Hub'
+  });
+} else {
+  admin.name = process.env.ADMIN_NAME || 'Samba Admin';
+  admin.phone = process.env.ADMIN_PHONE || admin.phone;
+  admin.password = adminPassword;
+}
+
+await admin.save();
+
+console.log('Admin account configured from environment variables.');
 
     // 3. Seed Demo Tractor
     let tractor = await Tractor.findOne({ registrationNumber: 'AP04 AB 1234' });
@@ -755,45 +776,9 @@ export const seedDatabase = async () => {
       console.log('Created demo tractor AP04 AB 1234');
     }
 
-    // 4. Seed Demo Rider
-    const riderEmail = 'rider@sambatractors.com';
-    let rider = await User.findOne({ email: riderEmail });
-    if (!rider) {
-      rider = new User({
-        name: 'Ramu (Senior Rider)',
-        email: riderEmail,
-        phone: '9848054321',
-        password: 'password123',
-        role: 'rider',
-        language: 'te',
-        village: 'Peddapuram',
-        assignedTractor: tractor._id,
-        isAvailable: true
-      });
-      await rider.save();
-      tractor.currentRider = rider._id;
-      tractor.status = 'assigned';
-      await tractor.save();
-      console.log('Created default rider: rider@sambatractors.com / password123');
-    }
+   
 
-    // 5. Seed Demo Farmer
-    const farmerEmail = 'farmer@sambatractors.com';
-    let farmer = await User.findOne({ email: farmerEmail });
-    if (!farmer) {
-      farmer = new User({
-        name: 'Venkat Rao (Farmer)',
-        email: farmerEmail,
-        phone: '9876543210',
-        password: 'password123',
-        role: 'farmer',
-        language: 'te',
-        village: 'Kovvur',
-        address: 'Main Road, Kovvur, East Godavari'
-      });
-      await farmer.save();
-      console.log('Created default demo farmer: farmer@sambatractors.com / password123');
-    }
+  
 
     // 6. Seed Payment Settings
     await Setting.findOneAndUpdate(
