@@ -34,19 +34,7 @@ export const Login = () => {
     }
   };
 
-  // Quick Demo Fill
-  const fillDemo = (role) => {
-    if (role === 'admin') {
-      setEmailOrPhone('admin@sambatractors.com');
-      setPassword('password123');
-    } else if (role === 'rider') {
-      setEmailOrPhone('rider@sambatractors.com');
-      setPassword('password123');
-    } else {
-      setEmailOrPhone('farmer@sambatractors.com');
-      setPassword('password123');
-    }
-  };
+ 
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
@@ -70,36 +58,7 @@ export const Login = () => {
           </div>
         )}
 
-        {/* Demo Fast Login Pills */}
-        <div className="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200/80 space-y-1.5">
-          <span className="text-[10px] font-bold uppercase text-emerald-800 block text-center">
-            Quick One-Click Demo Logins
-          </span>
-          <div className="grid grid-cols-3 gap-1.5 text-[11px] font-bold">
-            <button
-              type="button"
-              onClick={() => fillDemo('farmer')}
-              className="py-1 px-2 bg-white hover:bg-emerald-100 text-emerald-900 rounded-lg border border-emerald-300 shadow-xs"
-            >
-              🧑‍🌾 Farmer
-            </button>
-            <button
-              type="button"
-              onClick={() => fillDemo('rider')}
-              className="py-1 px-2 bg-white hover:bg-emerald-100 text-emerald-900 rounded-lg border border-emerald-300 shadow-xs"
-            >
-              🚜 Pilot / Rider
-            </button>
-            <button
-              type="button"
-              onClick={() => fillDemo('admin')}
-              className="py-1 px-2 bg-white hover:bg-emerald-100 text-emerald-900 rounded-lg border border-emerald-300 shadow-xs"
-            >
-              🛡️ Admin
-            </button>
-          </div>
-        </div>
-
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1">
