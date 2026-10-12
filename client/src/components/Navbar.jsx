@@ -129,15 +129,20 @@ useEffect(() => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo and Brand Title */}
-            <Link to="/" className="flex items-center gap-3 group">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-md shadow-amber-950/40 group-hover:scale-105 transition-transform duration-300">
-                <Tractor className="w-7 h-7 text-emerald-950 fill-emerald-950" />
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl sm:text-2xl font-extrabold tracking-tight text-white group-hover:text-amber-300 transition-colors">
-                    {brandName}
-                  </span>
+            <Link
+             to="/"
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 group"
+          >
+         <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-md shadow-amber-950/40 group-hover:scale-105 transition-transform duration-300">
+         <Tractor className="w-6 h-6 sm:w-7 sm:h-7 text-emerald-950 fill-emerald-950" />
+         </div>
+
+         <div className="flex min-w-0 flex-col">
+         <div className="flex min-w-0 items-center gap-2">
+         <span className="truncate text-lg sm:text-2xl font-extrabold tracking-tight text-white group-hover:text-amber-300 transition-colors">
+          {brandName}
+         </span>
                   <span className="hidden sm:inline-block px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded-full bg-amber-400 text-emerald-950">
                     Agri Mechanized
                   </span>
