@@ -762,19 +762,7 @@ await admin.save();
 
 console.log('Admin account configured from environment variables.');
 
-    // 3. Seed Demo Tractor
-    let tractor = await Tractor.findOne({ registrationNumber: 'AP04 AB 1234' });
-    if (!tractor) {
-      tractor = await Tractor.create({
-        name: 'Mahindra Novo 605 DI (60 HP 4WD)',
-        registrationNumber: 'AP04 AB 1234',
-        hp: 60,
-        type: '4WD Heavy Agricultural',
-        status: 'available',
-        image: '/images/hero_banner.jpg'
-      });
-      console.log('Created demo tractor AP04 AB 1234');
-    }
+
 
    
 
