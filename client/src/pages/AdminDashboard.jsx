@@ -25,9 +25,9 @@ import {
   ArrowUpRight,
   TrendingUp,
   Truck,
-  RotateCcw
+  RotateCcw,
+  Trash2
 } from 'lucide-react';
-
 export const AdminDashboard = () => {
   const { user } = useAuth();
   const { t, language } = useLanguage();
@@ -156,6 +156,25 @@ export const AdminDashboard = () => {
     }
   };
 
+  // Delete Rider
+const handleDeleteRider = async (rider) => {
+  const confirmed = window.confirm(
+    `Are you sure you want to delete rider ${rider.name}?`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await api.deleteRider(rider._id);
+    alert('Rider deleted successfully!');
+    await loadAllAdminData();
+  } catch (err) {
+    alert(err.message || 'Failed to delete rider');
+  }
+};
+
+// Create Rider
+const handleCreateRider = async (e) => {
   // Create Rider
   const handleCreateRider = async (e) => {
     e.preventDefault();
@@ -175,6 +194,25 @@ export const AdminDashboard = () => {
     }
   };
 
+  // Delete Tractor
+const handleDeleteTractor = async (tractor) => {
+  const confirmed = window.confirm(
+    `Are you sure you want to delete tractor ${tractor.registrationNumber}?`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    await api.deleteTractor(tractor._id);
+    alert('Tractor deleted successfully!');
+    await loadAllAdminData();
+  } catch (err) {
+    alert(err.message || 'Failed to delete tractor');
+  }
+};
+
+// Create Tractor
+const handleCreateTractor = async (e) => {
   // Create Tractor
   const handleCreateTractor = async (e) => {
     e.preventDefault();
@@ -641,19 +679,44 @@ export const AdminDashboard = () => {
 
             <div className="space-y-3">
               {resources.riders?.map((r) => (
-                <div key={r._id} className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-between text-xs">
-                  <div>
-                    <h4 className="font-bold text-gray-900 text-sm">{r.name}</h4>
-                    <p className="text-gray-500">📞 {r.phone} • 📍 {r.village || 'Hub'}</p>
-                    <p className="text-emerald-700 font-semibold mt-0.5">
-                      Assigned: {r.assignedTractor ? r.assignedTractor.registrationNumber : 'No Tractor Linked'}
-                    </p>
-                  </div>
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-100 text-emerald-800">
-                    Active Pilot
-                  </span>
-                </div>
-              ))}
+  <div
+    key={r._id}
+    className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-between gap-3 text-xs"
+  >
+    <div className="min-w-0">
+      <h4 className="font-bold text-gray-900 text-sm">
+        {r.name}
+      </h4>
+
+      <p className="text-gray-500">
+        📞 {r.phone} • 📍 {r.village || 'Hub'}
+      </p>
+
+      <p className="text-emerald-700 font-semibold mt-0.5">
+        Assigned:{' '}
+        {r.assignedTractor
+          ? r.assignedTractor.registrationNumber
+          : 'No Tractor Linked'}
+      </p>
+    </div>
+
+    <div className="flex items-center gap-2 shrink-0">
+      <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-100 text-emerald-800">
+        Active Pilot
+      </span>
+
+      <button
+        type="button"
+        onClick={() => handleDeleteRider(r)}
+        className="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
+        title="Delete Rider"
+        aria-label={`Delete rider ${r.name}`}
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    </div>
+  </div>
+))}
             </div>
 
             {/* Quick Add Rider Form */}
@@ -720,17 +783,41 @@ export const AdminDashboard = () => {
 
             <div className="space-y-3">
               {resources.tractors?.map((tr) => (
-                <div key={tr._id} className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-between text-xs">
-                  <div>
-                    <h4 className="font-bold text-gray-900 text-sm">{tr.name}</h4>
-                    <p className="font-mono text-gray-600 font-semibold">{tr.registrationNumber}</p>
-                    <p className="text-gray-500">{tr.hp} HP • {tr.type}</p>
-                  </div>
-                  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-blue-100 text-blue-800 uppercase">
-                    {tr.status}
-                  </span>
-                </div>
-              ))}
+  <div
+    key={tr._id}
+    className="p-3.5 rounded-2xl bg-gray-50 border border-gray-200 flex items-center justify-between gap-3 text-xs"
+  >
+    <div className="min-w-0">
+      <h4 className="font-bold text-gray-900 text-sm">
+        {tr.name}
+      </h4>
+
+      <p className="font-mono text-gray-600 font-semibold">
+        {tr.registrationNumber}
+      </p>
+
+      <p className="text-gray-500">
+        {tr.hp} HP • {tr.type}
+      </p>
+    </div>
+
+    <div className="flex items-center gap-2 shrink-0">
+      <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-blue-100 text-blue-800 uppercase">
+        {tr.status}
+      </span>
+
+      <button
+        type="button"
+        onClick={() => handleDeleteTractor(tr)}
+        className="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
+        title="Delete Tractor"
+        aria-label={`Delete tractor ${tr.registrationNumber}`}
+      >
+        <Trash2 className="w-4 h-4" />
+      </button>
+    </div>
+  </div>
+))}
             </div>
 
             {/* Quick Add Tractor */}
