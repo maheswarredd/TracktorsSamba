@@ -81,17 +81,17 @@ export const NotificationDrawer = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden bg-black/50 backdrop-blur-sm flex justify-end animate-fadeIn">
-      <div className="w-full max-w-md bg-white h-full shadow-2xl flex flex-col transform transition-transform duration-300">
+    <div className="fixed inset-0 z-[100] overflow-hidden bg-black/50 backdrop-blur-sm flex justify-end animate-fadeIn">
+      <div className="w-full max-w-md bg-white h-[100dvh] shadow-2xl flex flex-col transform transition-transform duration-300">
         {/* Header */}
-        <div className="px-6 py-4 bg-emerald-800 text-white flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-4 bg-emerald-800 text-white flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-emerald-300" />
             <h3 className="font-bold text-lg">
               {language === 'te' ? 'నోటిఫికేషన్‌లు' : language === 'hi' ? 'सूचनाएं' : 'Notifications'}
             </h3>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
             <button
               onClick={handleEnablePush}
               disabled={pushBusy}
