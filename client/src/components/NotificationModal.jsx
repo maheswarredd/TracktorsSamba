@@ -34,20 +34,24 @@ export const NotificationDrawer = ({ isOpen, onClose }) => {
   }, [isOpen]);
 
   useEffect(() => {
-    if (!socket) return;
-    const handleStatusUpdate = () => {
-      fetchNotifications();
-    };
-    socket.on('booking_status_updated', handleStatusUpdate);
-    socket.on('payment_submitted', handleStatusUpdate);
-    socket.on('new_notification', handleStatusUpdate);
+  if (!socket) return;
 
-    return () => {
-      socket.off('booking_status_updated', handleStatusUpdate);
-      socket.off('payment_submitted', handleStatusUpdate);
-      socket.off('new_notification', handleStatusUpdate);
-    };
-  }, [socket]);
+  const handleStatusUpdate = () => {
+    fetchNotifications();
+  };
+
+  socket.on('booking_status_updated', handleStatusUpdate);
+  socket.on('payment_submitted', handleStatusUpdate);
+  socket.on('new_notification', handleStatusUpdate);
+  socket.on('new_booking', handleStatusUpdate);
+
+  return () => {
+    socket.off('booking_status_updated', handleStatusUpdate);
+    socket.off('payment_submitted', handleStatusUpdate);
+    socket.off('new_notification', handleStatusUpdate);
+    socket.off('new_booking', handleStatusUpdate);
+  };
+}, [socket]);
 
   const handleEnablePush = async () => {
     setPushBusy(true);
