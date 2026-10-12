@@ -142,7 +142,8 @@ export const Footer = () => {
   <img
   src="/images/developer-profile.png"
   alt="Maheswar Reddy - Full Stack Developer"
-  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
+  className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-125"
+  onLoad={() => console.log("Developer image loaded")}
   onError={(e) => {
     console.error("Developer image failed to load:", e.currentTarget.src);
   }}
@@ -245,10 +246,11 @@ export const Footer = () => {
                       <img
   src="/images/developer-profile.png"
   alt="Maheswar Reddy, Full Stack Developer"
-  className="block h-auto w-full object-cover"
+  className="block h-auto w-full object-contain"
+  onLoad={() => console.log("Developer image loaded")}
   onError={(e) => {
     console.error(
-      "Popup developer image failed:",
+      "Image failed:",
       e.currentTarget.src
     );
   }}
