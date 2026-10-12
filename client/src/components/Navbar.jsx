@@ -10,6 +10,7 @@ import {
   Tractor,
   Menu,
   X,
+  MoreVertical,
   User as UserIcon,
   LogOut,
   Bell,
@@ -274,14 +275,20 @@ useEffect(() => {
                 </div>
               )}
 
-              {/* Mobile menu hamburger button */}
+              {/* Mobile three-dot menu */}
               <button
-                type="button"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 rounded-xl text-emerald-200 hover:text-white hover:bg-emerald-800/80 transition"
-              >
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
+               type="button"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+             aria-expanded={mobileMenuOpen}
+            className="lg:hidden shrink-0 p-2.5 rounded-xl border border-emerald-600/50 bg-emerald-800/70 text-white hover:bg-emerald-700 active:scale-95 transition"
+            >
+           {mobileMenuOpen ? (
+           <X className="w-5 h-5" />
+           ) : (
+          <MoreVertical className="w-5 h-5" />
+          )}
+         </button>
             </div>
           </div>
         </div>
