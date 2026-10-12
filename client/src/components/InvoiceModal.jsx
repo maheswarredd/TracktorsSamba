@@ -101,7 +101,7 @@ export const InvoiceModal = ({ isOpen, onClose, booking }) => {
                 Tractor: {booking.tractor?.name || 'Mahindra Novo 605 DI'}
               </p>
               <p className="text-gray-600">
-                Reg: {booking.tractor?.registrationNumber || 'AP04 AB 1234'}
+               Reg: {booking.tractor?.registrationNumber || 'Not assigned'}
               </p>
               <p className="text-emerald-700 font-medium mt-1">Slot: {timeSlotLabel}</p>
             </div>
