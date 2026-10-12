@@ -18,6 +18,51 @@ import {
   PhoneCall,
   ShieldCheck
 } from 'lucide-react';
+const playNotificationSound = () => {
+  try {
+    const AudioContextClass =
+      window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) return;
+
+    const audioContext = new AudioContextClass();
+
+    const playTone = (frequency, startTime, duration) => {
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+
+      oscillator.type = 'sine';
+      oscillator.frequency.value = frequency;
+
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.exponentialRampToValueAtTime(
+        0.12,
+        startTime + 0.02
+      );
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        startTime + duration
+      );
+
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+
+      oscillator.start(startTime);
+      oscillator.stop(startTime + duration);
+    };
+
+    const startTime = audioContext.currentTime;
+
+    playTone(880, startTime, 0.16);
+    playTone(1174, startTime + 0.18, 0.2);
+
+    window.setTimeout(() => {
+      audioContext.close().catch(() => {});
+    }, 600);
+  } catch (error) {
+    console.warn('Notification sound unavailable:', error.message);
+  }
+};
 
 export const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -45,20 +90,29 @@ export const Navbar = () => {
     fetchUnread();
   }, [isAuthenticated, location.pathname]);
 
-  useEffect(() => {
-    if (!socket) return;
-    socket.on('booking_status_updated', fetchUnread);
-    socket.on('payment_submitted', fetchUnread);
-    socket.on('new_booking', fetchUnread);
-    socket.on('new_notification', fetchUnread);
+useEffect(() => {
+  if (!socket) return;
 
-    return () => {
-      socket.off('booking_status_updated', fetchUnread);
-      socket.off('payment_submitted', fetchUnread);
-      socket.off('new_booking', fetchUnread);
-      socket.off('new_notification', fetchUnread);
-    };
-  }, [socket]);
+  const handleNewNotification = () => {
+    fetchUnread();
+
+    if (document.visibilityState === 'visible') {
+      playNotificationSound();
+    }
+  };
+
+  socket.on('booking_status_updated', fetchUnread);
+  socket.on('payment_submitted', fetchUnread);
+  socket.on('new_booking', fetchUnread);
+  socket.on('new_notification', handleNewNotification);
+
+  return () => {
+    socket.off('booking_status_updated', fetchUnread);
+    socket.off('payment_submitted', fetchUnread);
+    socket.off('new_booking', fetchUnread);
+    socket.off('new_notification', handleNewNotification);
+  };
+}, [socket]);
 
   const handleLogout = () => {
     logout();
