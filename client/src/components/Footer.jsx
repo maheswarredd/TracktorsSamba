@@ -139,12 +139,15 @@ export const Footer = () => {
     aria-label="Open developer profile"
   >
     <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-amber-400">
-      <img
-        src="/images/developer-profile.png"
-        alt="Developer profile"
-        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
-      />
-    </span>
+  <img
+    src="/images/developer-profile.png"
+    alt="Maheswar Reddy - Full Stack Developer"
+    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
+    onError={(e) => {
+      console.error("Developer image failed to load:", e.currentTarget.src);
+    }}
+  />
+</span>
 
     <span className="text-left">
       <span className="block font-bold text-white">
