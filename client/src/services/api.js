@@ -160,12 +160,22 @@ export const api = {
       headers: getAuthHeaders(),
       body: JSON.stringify(riderData)
     }).then(handleResponse),
+  deleteRider: (riderId) =>
+    fetch(`${BASE_URL}/api/admin/riders/${riderId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    }).then(handleResponse),
 
   createTractor: (tractorData) =>
     fetch(`${BASE_URL}/api/admin/tractors`, {
       method: 'POST',
       headers: getAuthHeaders(),
       body: JSON.stringify(tractorData)
+    }).then(handleResponse),
+  deleteTractor: (tractorId) =>
+    fetch(`${BASE_URL}/api/admin/tractors/${tractorId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
     }).then(handleResponse),
 
   updateSettings: (settingsData) =>
