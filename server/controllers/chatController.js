@@ -1,6 +1,7 @@
 import ChatMessage from '../models/Chat.js';
 import Booking from '../models/Booking.js';
 import { getIO } from '../config/socket.js';
+import Notification from '../models/Notification.js';
 
 // @desc    Get chat message history for a booking
 // @route   GET /api/chat/:bookingId
@@ -45,12 +46,58 @@ export const sendChatMessage = async (req, res) => {
     }
 
     const chatMsg = await ChatMessage.create({
+  booking: booking._id,
+  sender: req.user._id,
+  senderName: req.user.name,
+  senderRole: req.user.role,
+  message: message.trim()
+});
+
+// Notify the other booking participants.
+const recipients = [];
+
+if (
+  booking.farmer &&
+  booking.farmer.toString() !== req.user._id.toString()
+) {
+  recipients.push(booking.farmer);
+}
+
+if (
+  booking.rider &&
+  booking.rider.toString() !== req.user._id.toString()
+) {
+  recipients.push(booking.rider);
+}
+
+const uniqueRecipients = [
+  ...new Map(
+    recipients.map((id) => [id.toString(), id])
+  ).values()
+];
+
+await Promise.all(
+  uniqueRecipients.map((recipientId) =>
+    Notification.create({
+      recipient: recipientId,
       booking: booking._id,
-      sender: req.user._id,
-      senderName: req.user.name,
-      senderRole: req.user.role,
-      message: message.trim()
-    });
+      bookingId: booking.bookingId,
+      type: 'SUPPORT_REPLY',
+
+      title: {
+        te: `${req.user.name} నుండి కొత్త సందేశం`,
+        en: `New message from ${req.user.name}`,
+        hi: `${req.user.name} का नया संदेश`
+      },
+
+      message: {
+        te: message.trim(),
+        en: message.trim(),
+        hi: message.trim()
+      }
+    })
+  )
+);
 
     // Real-time broadcast via Socket.IO room
     try {
