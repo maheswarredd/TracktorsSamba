@@ -80,7 +80,7 @@ export const Footer = () => {
             <div className="space-y-2.5 text-xs text-emerald-200/80">
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-amber-400" />
-                <a href="tel:+919848012345" className="hover:text-white font-medium">+91 98480 12345 (24/7 Kisan Helpline)</a>
+                <a href="tel:+919440727491" className="hover:text-white font-medium">+91 9440727491 (24/7 Kisan Helpline)</a>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-amber-400" />
@@ -88,7 +88,7 @@ export const Footer = () => {
               </div>
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
-                <span>Samba Agricultural Hub, Market Yard Road, Kovvur, Andhra Pradesh 534350</span>
+                <span>Samba Tracktors, Muthulurupaddu, Khajipeta, Andhra Pradesh 516203</span>
               </div>
             </div>
           </div>
