@@ -173,8 +173,6 @@ const handleDeleteRider = async (rider) => {
   }
 };
 
-// Create Rider
-const handleCreateRider = async (e) => {
   // Create Rider
   const handleCreateRider = async (e) => {
     e.preventDefault();
@@ -211,8 +209,7 @@ const handleDeleteTractor = async (tractor) => {
   }
 };
 
-// Create Tractor
-const handleCreateTractor = async (e) => {
+
   // Create Tractor
   const handleCreateTractor = async (e) => {
     e.preventDefault();
