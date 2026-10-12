@@ -15,16 +15,34 @@ export const sendWebPushToUser = async (userId, notification) => {
   try {
     const webPush = await getWebPush();
     webPush.setVapidDetails(subject, publicKey, privateKey);
-    const user = await User.findById(userId).select('pushSubscriptions');
+    const user = await User.findById(userId).select('pushSubscriptions role');
     if (!user?.pushSubscriptions?.length) return;
     const lang = ['te', 'hi', 'en'].includes(user.language) ? user.language : 'en';
-    const payload = JSON.stringify({
-      title: notification.title?.[lang] || notification.title?.en || 'Samba Tractors',
-      body: notification.message?.[lang] || notification.message?.en || 'Your booking has an update.',
-      url: notification.booking ? `/farmer-dashboard` : '/',
-      notificationId: String(notification._id),
-      bookingId: notification.bookingId || ''
-    });
+    const dashboardUrl =
+  user.role === 'admin'
+    ? '/admin-dashboard'
+    : user.role === 'rider'
+      ? '/rider-dashboard'
+      : '/farmer-dashboard';
+
+const payload = JSON.stringify({
+  title:
+    notification.title?.[lang] ||
+    notification.title?.en ||
+    'Samba Tractors',
+
+  body:
+    notification.message?.[lang] ||
+    notification.message?.en ||
+    'Your booking has an update.',
+
+  url: notification.booking
+    ? dashboardUrl
+    : '/',
+
+  notificationId: String(notification._id),
+  bookingId: notification.bookingId || ''
+});
     const expired = [];
     await Promise.all(user.pushSubscriptions.map(async (subscription) => {
       try { await webPush.sendNotification(subscription, payload); }
