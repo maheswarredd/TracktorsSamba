@@ -360,6 +360,111 @@ export const createTractor = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+// @desc Delete a rider created in the system
+// @route DELETE /api/admin/riders/:id
+// @access Admin only
+export const deleteRider = async (req, res) => {
+  try {
+    const rider = await User.findOne({
+      _id: req.params.id,
+      role: 'rider'
+    });
+
+    if (!rider) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rider not found'
+      });
+    }
+
+    // Protect existing booking history
+    const hasBookings = await Booking.exists({
+      rider: rider._id
+    });
+
+    if (hasBookings) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'This rider is linked to existing bookings. Unassign or resolve those bookings before deleting.'
+      });
+    }
+
+    // Remove rider references from tractors and other users
+    await Tractor.updateMany(
+      { currentRider: rider._id },
+      {
+        $unset: { currentRider: 1 },
+        $set: { status: 'available' }
+      }
+    );
+
+    await User.updateMany(
+      { assignedTractor: { $exists: true } },
+      { $unset: { assignedTractor: 1 } }
+    );
+
+    await User.deleteOne({ _id: rider._id });
+
+    return res.json({
+      success: true,
+      message: 'Rider deleted successfully'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+
+// @desc Delete a tractor created in the system
+// @route DELETE /api/admin/tractors/:id
+// @access Admin only
+export const deleteTractor = async (req, res) => {
+  try {
+    const tractor = await Tractor.findById(req.params.id);
+
+    if (!tractor) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tractor not found'
+      });
+    }
+
+    // Protect existing booking history
+    const hasBookings = await Booking.exists({
+      tractor: tractor._id
+    });
+
+    if (hasBookings) {
+      return res.status(400).json({
+        success: false,
+        message:
+          'This tractor is linked to existing bookings. Resolve those bookings before deleting.'
+      });
+    }
+
+    // Remove references to this tractor from riders
+    await User.updateMany(
+      { assignedTractor: tractor._id },
+      { $unset: { assignedTractor: 1 } }
+    );
+
+    await Tractor.deleteOne({ _id: tractor._id });
+
+    return res.json({
+      success: true,
+      message: 'Tractor deleted successfully'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 
 // @desc    Update Settings (UPI ID, QR code)
 // @route   PUT /api/admin/settings
