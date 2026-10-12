@@ -140,13 +140,13 @@ export const Footer = () => {
   >
    <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-amber-400">
   <img
-    src="https://raw.githubusercontent.com/maheswarredd/TracktorsSamba/main/client/public/images/developer-profile.png"
-    alt="Maheswar Reddy - Full Stack Developer"
-    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
-    onError={(e) => {
-      console.error("Developer image failed to load:", e.currentTarget.src);
-    }}
-  />
+  src="/images/developer-profile.png"
+  alt="Maheswar Reddy - Full Stack Developer"
+  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
+  onError={(e) => {
+    console.error("Developer image failed to load:", e.currentTarget.src);
+  }}
+/>
 </span>
 
     <span className="text-left">
@@ -243,10 +243,16 @@ export const Footer = () => {
 
                     <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-slate-900 shadow-2xl">
                       <img
-                        src="/images/developer-profile.png"
-                        alt="Maheswar Reddy, Full Stack Developer"
-                        className="block h-auto w-full object-cover"
-                      />
+  src="/images/developer-profile.png"
+  alt="Maheswar Reddy, Full Stack Developer"
+  className="block h-auto w-full object-cover"
+  onError={(e) => {
+    console.error(
+      "Popup developer image failed:",
+      e.currentTarget.src
+    );
+  }}
+/>
                     </div>
                   </motion.div>
 
