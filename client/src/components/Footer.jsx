@@ -281,7 +281,7 @@ export const Footer = () => {
                     <div className="rounded-xl border border-white/10 bg-white/5 p-3">
                       <p className="text-xs text-slate-400">Education</p>
                       <p className="mt-1 text-sm font-semibold text-white">
-                        MPCS
+                        BTech
                       </p>
                     </div>
 
