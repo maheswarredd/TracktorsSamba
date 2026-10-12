@@ -485,7 +485,9 @@ const handleCreateTractor = async (e) => {
                       {b.rider ? (
                         <div>
                           <p className="font-bold text-gray-900">{b.rider.name}</p>
-                          <p className="text-[10px] text-gray-500">{b.tractor?.registrationNumber || 'AP04 AB 1234'}</p>
+                          <p className="text-[10px] text-gray-500">
+                           {b.tractor?.registrationNumber || 'Not assigned'}
+                          </p>
                         </div>
                       ) : (
                         <span className="text-[11px] text-amber-600 font-bold">Unassigned</span>
