@@ -4,13 +4,21 @@ self.addEventListener('push', (event) => {
   try { data = event.data ? event.data.json() : {}; } catch { data = { body: event.data?.text() || '' }; }
   const title = data.title || 'Samba Tractors';
   const options = {
-    body: data.body || 'Your booking has an update.',
-    icon: '/favicon.svg',
-    badge: '/favicon.svg',
-    tag: data.notificationId || data.bookingId || 'samba-update',
-    data: { url: data.url || '/', bookingId: data.bookingId || '' },
-    renotify: true
-  };
+  body: data.body || 'Your booking has an update.',
+  icon: '/favicon.svg',
+  badge: '/favicon.svg',
+
+  tag: data.notificationId || data.bookingId || 'samba-update',
+
+  data: {
+    url: data.url || '/',
+    bookingId: data.bookingId || ''
+  },
+
+  renotify: true,
+  vibrate: [200, 100, 200],
+  requireInteraction: false
+};
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
