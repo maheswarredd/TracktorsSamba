@@ -140,13 +140,9 @@ export const Footer = () => {
   >
    <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border-2 border-amber-400">
   <img
-  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop&crop=faces"
+  src="https://i.ibb.co/RTddRmJk/Maheswar-Reddy-website.png"
   alt="Maheswar Reddy - Full Stack Developer"
-  className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-125"
-  onLoad={() => console.log("Developer image loaded")}
-  onError={(e) => {
-    console.error("Developer image failed to load:", e.currentTarget.src);
-  }}
+  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-125"
 />
 </span>
 
@@ -244,17 +240,10 @@ export const Footer = () => {
 
                     <div className="relative overflow-hidden rounded-2xl border border-white/20 bg-slate-900 shadow-2xl">
                       <img
-  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop&crop=faces"
-  alt="Maheswar Reddy, Full Stack Developer"
-  className="block h-auto w-full object-contain"
-  onLoad={() => console.log("Developer image loaded")}
-  onError={(e) => {
-    console.error(
-      "Image failed:",
-      e.currentTarget.src
-    );
-  }}
-/>
+                      src="https://i.ibb.co/RTddRmJk/Maheswar-Reddy-website.png"
+                      alt="Maheswar Reddy - Full Stack Developer"
+                       className="block h-auto w-full object-contain"
+                      />                   
                     </div>
                   </motion.div>
 
