@@ -6,6 +6,8 @@ import {
   getAdminResources,
   createRider,
   createTractor,
+  deleteRider,
+  deleteTractor,
   updateSettings
 } from '../controllers/adminController.js';
 import { protect, authorize } from '../middleware/auth.js';
@@ -19,8 +21,13 @@ router.get('/stats', getAdminStats);
 router.get('/bookings', getAllBookings);
 router.post('/bookings/:id/assign', assignRiderAndTractor);
 router.get('/resources', getAdminResources);
+
 router.post('/riders', createRider);
+router.delete('/riders/:id', deleteRider);
+
 router.post('/tractors', createTractor);
+router.delete('/tractors/:id', deleteTractor);
+
 router.put('/settings', updateSettings);
 
 export default router;
