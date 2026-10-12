@@ -219,9 +219,11 @@ useEffect(() => {
               )}
             </nav>
 
-            {/* Right actions: Language Selector, Notification, Auth */}
-            <div className="flex items-center gap-3">
-              <LanguageSelector />
+            {/* Right actions: compact mobile layout */}
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+          <div className="hidden sm:block">
+           <LanguageSelector />
+         </div>
 
               {isAuthenticated && (
                 <button
@@ -295,7 +297,14 @@ useEffect(() => {
 
         {/* Mobile menu dropdown */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-emerald-900 border-t border-emerald-700/60 px-4 pt-3 pb-6 space-y-3 animate-fadeIn">
+          <div className="lg:hidden absolute left-0 right-0 top-full max-h-[calc(100dvh-5rem)] overflow-y-auto bg-emerald-950 border-t border-emerald-700/60 px-4 pt-3 pb-6 space-y-3 shadow-2xl animate-fadeIn">
+            <div className="pb-3 border-b border-emerald-800">
+             <p className="text-xs font-semibold text-emerald-300 mb-2">
+              Language / భాష / भाषा
+            </p>
+
+           <LanguageSelector />
+           </div>
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
@@ -317,6 +326,27 @@ useEffect(() => {
             >
               🚜 {t('nav.bookNow')}
             </Link>
+            {isAuthenticated && (
+  <button
+    type="button"
+    onClick={() => {
+      setMobileMenuOpen(false);
+      setNotificationOpen(true);
+    }}
+    className="w-full flex items-center justify-between py-3 px-3 rounded-xl bg-emerald-800/70 text-white hover:bg-emerald-700 transition"
+  >
+    <span className="flex items-center gap-3">
+      <Bell className="w-5 h-5 text-amber-300" />
+      <span className="font-semibold">Notifications</span>
+    </span>
+
+    {unreadCount > 0 && (
+      <span className="min-w-6 h-6 px-1 rounded-full bg-rose-500 text-white text-xs font-bold flex items-center justify-center">
+        {unreadCount > 99 ? '99+' : unreadCount}
+      </span>
+    )}
+  </button>
+)}
 
             {user?.role === 'farmer' && (
               <Link
