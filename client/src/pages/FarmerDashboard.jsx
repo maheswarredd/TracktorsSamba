@@ -243,7 +243,7 @@ export const FarmerDashboard = () => {
                         {b.tractor ? b.tractor.name : 'Mahindra Novo 605 DI'}
                       </p>
                       <p className="font-mono text-gray-500 mt-0.5">
-                        Reg: {b.tractor ? b.tractor.registrationNumber : 'AP04 AB 1234'}
+                      Reg: {b.tractor?.registrationNumber || 'Not assigned'}
                       </p>
                     </div>
 
