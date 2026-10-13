@@ -68,8 +68,8 @@ export const RapidoMapPicker = ({
 
   // Default coordinate: Kovvur/Rajahmundry Godavari farmland AP (17.0044, 81.7300)
   const [position, setPosition] = useState([
-    locationData.latitude || 17.0044,
-    locationData.longitude || 81.7300
+    locationData.latitude || 14.67524,
+    locationData.longitude || 78.73412
   ]);
 
   // Request GPS Location (Rapido-style)
