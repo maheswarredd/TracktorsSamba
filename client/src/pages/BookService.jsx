@@ -37,12 +37,11 @@ export const BookService = () => {
     quantity: 1,
     bookingDate: new Date().toISOString().slice(0, 10),
     timeSlot: 'MORNING', // MORNING, AFTERNOON, EVENING, NIGHT
-    farmLocation: {
-      latitude: 17.0044,
-      longitude: 81.7300,
-      address: '',
-      village: '',
-      landmark: '',
+   farmLocation: {
+      latitude: 14.67524,
+      longitude: 78.73412,
+      address: 'Muthulurupadu, Khajipeta Mandal, Kadapa District, Andhra Pradesh - 516203',
+      village: 'Muthulurupadu',      landmark: '',
       locationInstructions: ''
     },
     paymentMethod: 'ONLINE', // ONLINE or OFFLINE
