@@ -40,8 +40,9 @@ export const BookService = () => {
    farmLocation: {
       latitude: 14.67524,
       longitude: 78.73412,
-      address: 'Muthulurupadu, Khajipeta Mandal, Kadapa District, Andhra Pradesh - 516203',
-      village: 'Muthulurupadu',      landmark: '',
+      address: '',
+      village: '',      
+      landmark: '',
       locationInstructions: ''
     },
     paymentMethod: 'ONLINE', // ONLINE or OFFLINE
