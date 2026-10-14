@@ -157,6 +157,192 @@ const [earningLoading, setEarningLoading] = useState(false);
 
       {/* Tabs */}
       <div className="flex border-b border-gray-200 gap-4 text-sm font-bold">
+              {/* Rider Earnings Dashboard */}
+      <div className="space-y-5">
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-black text-gray-900">
+              Earnings Dashboard
+            </h2>
+            <p className="text-xs text-gray-500">
+              Track your daily, weekly and monthly earnings
+            </p>
+          </div>
+
+          <Wallet className="w-7 h-7 text-emerald-600" />
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+
+          <div className="bg-gradient-to-br from-emerald-600 to-green-700 text-white rounded-3xl p-5 shadow-lg">
+            <div className="flex justify-between">
+              <span className="text-xs font-bold">
+                Today's Earnings
+              </span>
+              <IndianRupee className="w-5 h-5" />
+            </div>
+
+            <p className="text-3xl font-black mt-3">
+              ₹{earnings.today.amount.toLocaleString()}
+            </p>
+
+            <p className="text-xs text-emerald-100 mt-1">
+              {earnings.today.rides} rides
+            </p>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-sm">
+            <span className="text-xs font-bold text-gray-500">
+              This Week
+            </span>
+
+            <p className="text-2xl font-black text-gray-900 mt-3">
+              ₹{earnings.weekly.amount.toLocaleString()}
+            </p>
+
+            <p className="text-xs text-gray-500 mt-1">
+              {earnings.weekly.rides} rides
+            </p>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-sm">
+            <span className="text-xs font-bold text-gray-500">
+              This Month
+            </span>
+
+            <p className="text-2xl font-black text-gray-900 mt-3">
+              ₹{earnings.monthly.amount.toLocaleString()}
+            </p>
+
+            <p className="text-xs text-gray-500 mt-1">
+              {earnings.monthly.rides} rides
+            </p>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-sm">
+            <span className="text-xs font-bold text-gray-500">
+              Total Earnings
+            </span>
+
+            <p className="text-2xl font-black text-emerald-700 mt-3">
+              ₹{earnings.total.amount.toLocaleString()}
+            </p>
+
+            <p className="text-xs text-gray-500 mt-1">
+              {earnings.total.rides} earning records
+            </p>
+          </div>
+
+        </div>
+
+        {/* Date Earnings */}
+        <div className="bg-white border border-gray-200 rounded-3xl p-5 shadow-sm">
+
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+
+            <div>
+              <h3 className="font-black text-gray-900">
+                Earnings by Date
+              </h3>
+
+              <p className="text-xs text-gray-500">
+                Select any date to see earnings and orders
+              </p>
+            </div>
+
+            <input
+              type="date"
+              value={earningDate}
+              onChange={(e) =>
+                handleDateEarnings(e.target.value)
+              }
+              className="border border-gray-300 rounded-xl px-3 py-2 text-sm font-semibold"
+            />
+
+          </div>
+
+          {dateEarnings && (
+            <div className="mt-5">
+
+              <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 mb-4">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-xs text-emerald-700 font-bold">
+                      Selected Date
+                    </p>
+                    <p className="text-lg font-black text-gray-900">
+                      {dateEarnings.date}
+                    </p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500">
+                      Earnings
+                    </p>
+                    <p className="text-2xl font-black text-emerald-700">
+                      ₹{dateEarnings.total.toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+
+                {dateEarnings.earnings.map((earning) => (
+                  <div
+                    key={earning._id}
+                    className="border border-gray-100 rounded-2xl p-4 bg-gray-50"
+                  >
+                    <div className="flex justify-between gap-3">
+
+                      <div>
+                        <p className="font-black text-gray-900">
+                          #{earning.bookingId}
+                        </p>
+
+                        <p className="text-xs text-gray-600 mt-1">
+                          Farmer: {earning.booking?.farmerName}
+                        </p>
+
+                        <p className="text-xs text-gray-500">
+                          Service:{' '}
+                          {earning.booking?.serviceSnapshot?.name?.en}
+                        </p>
+
+                        <p className="text-xs text-gray-500">
+                          Order Amount: ₹
+                          {Number(
+                            earning.bookingAmount || 0
+                          ).toLocaleString()}
+                        </p>
+                      </div>
+
+                      <div className="text-right">
+                        <p className="text-lg font-black text-emerald-700">
+                          ₹{earning.earningAmount.toLocaleString()}
+                        </p>
+
+                        <span className="text-[10px] font-bold uppercase text-gray-500">
+                          {earning.mode.replaceAll('_', ' ')}
+                        </span>
+                      </div>
+
+                    </div>
+                  </div>
+                ))}
+
+              </div>
+
+            </div>
+          )}
+
+        </div>
+
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-gray-200 gap-4 text-sm font-bold">
         {[
           { key: 'todays', label: t('rider.todaysTasks'), count: data.todays?.length || 0 },
           { key: 'upcoming', label: t('rider.upcoming'), count: data.upcoming?.length || 0 },
