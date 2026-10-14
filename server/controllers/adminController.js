@@ -284,7 +284,16 @@ export const getAdminResources = async (req, res) => {
 // @access  Private (Admin)
 export const createRider = async (req, res) => {
   try {
-    const { name, email, phone, password, village, assignedTractor } = req.body;
+    const {
+  name,
+  email,
+  phone,
+  password,
+  village,
+  assignedTractor,
+  riderEarningMode,
+  riderEarningValue
+} = req.body;
 
 if (!name || !email || !phone || !password) {
   return res.status(400).json({
@@ -305,14 +314,20 @@ if (password.length < 12) {
     }
 
     const rider = await User.create({
-      name,
-      email: email.toLowerCase(),
-      phone,
-      password,
-      role: 'rider',
-      village: village || '',
-      assignedTractor: assignedTractor || null
-    });
+  name,
+  email: email.toLowerCase(),
+  phone,
+  password,
+  role: 'rider',
+  village: village || '',
+  assignedTractor: assignedTractor || null,
+
+  riderEarningMode:
+    riderEarningMode || 'PER_RIDE_FIXED',
+
+  riderEarningValue:
+    Number(riderEarningValue) || 0
+});
 
     if (assignedTractor) {
       await Tractor.findByIdAndUpdate(assignedTractor, {
