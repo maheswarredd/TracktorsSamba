@@ -854,14 +854,24 @@ const handleDeleteTractor = async (tractor) => {
       </span>
 
       <button
-        type="button"
-        onClick={() => handleDeleteTractor(tr)}
-        className="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
-        title="Delete Tractor"
-        aria-label={`Delete tractor ${tr.registrationNumber}`}
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
+  type="button"
+  onClick={() => handleEditTractor(tr)}
+  className="p-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+  title="Edit Tractor"
+  aria-label={`Edit tractor ${tr.registrationNumber}`}
+>
+  <Edit className="w-4 h-4" />
+</button>
+
+<button
+  type="button"
+  onClick={() => handleDeleteTractor(tr)}
+  className="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
+  title="Delete Tractor"
+  aria-label={`Delete tractor ${tr.registrationNumber}`}
+>
+  <Trash2 className="w-4 h-4" />
+</button>
     </div>
   </div>
 ))}
