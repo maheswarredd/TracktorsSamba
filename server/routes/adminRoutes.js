@@ -28,6 +28,7 @@ router.put('/riders/:id', updateRider);
 router.delete('/riders/:id', deleteRider);
 
 router.post('/tractors', createTractor);
+router.put('/tractors/:id', updateTractor);
 router.delete('/tractors/:id', deleteTractor);
 
 router.put('/settings', updateSettings);
