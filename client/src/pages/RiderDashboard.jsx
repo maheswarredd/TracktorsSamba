@@ -520,23 +520,24 @@ const [earningLoading, setEarningLoading] = useState(false);
                         <span>{t('rider.collectCash')} (₹{b.totalAmount?.toLocaleString()})</span>
                       </button>
                     )}
-                  </div>
+                   </div>
                 </div>
+              </div>
               </div>
             );
           })}
         </div>
       )}
 
-      {selectedBookingForChat && (
-        <ChatModal
-          isOpen={!!selectedBookingForChat}
-          onClose={() => setSelectedBookingForChat(null)}
-          bookingId={selectedBookingForChat._id}
-          recipientName={selectedBookingForChat.farmerName}
-        />
-      )}
-    </div>
+     {selectedBookingForChat && (
+  <ChatModal
+    isOpen={!!selectedBookingForChat}
+    onClose={() => setSelectedBookingForChat(null)}
+    bookingId={selectedBookingForChat._id}
+    recipientName={selectedBookingForChat.farmerName}
+  />
+)}
+</div>
   );
 };
 
