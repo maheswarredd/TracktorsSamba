@@ -2,6 +2,7 @@ import Booking from '../models/Booking.js';
 import Notification from '../models/Notification.js';
 import User from '../models/User.js';
 import { getIO } from '../config/socket.js';
+import RiderEarning from '../models/RiderEarning.js';
 
 // @desc    Get bookings assigned to logged-in rider
 // @route   GET /api/rider/bookings
@@ -82,19 +83,81 @@ export const updateBookingStatusByRider = async (req, res) => {
       note: note || `Status changed to ${status} by Rider ${req.user.name}`
     });
 
-    if (status === 'SERVICE_STARTED') {
-      booking.serviceStartedAt = new Date();
-    }
     if (status === 'SERVICE_COMPLETED') {
-      booking.serviceCompletedAt = new Date();
-      // If payment was already verified online, mark payment completed
-      if (booking.paymentMethod === 'ONLINE' && booking.paymentStatus === 'VERIFIED') {
-        booking.paymentStatus = 'COMPLETED';
-        booking.status = 'PAYMENT_COMPLETED';
+  booking.serviceCompletedAt = new Date();
+
+  // If payment was already verified online, mark payment completed
+  if (
+    booking.paymentMethod === 'ONLINE' &&
+    booking.paymentStatus === 'VERIFIED'
+  ) {
+    booking.paymentStatus = 'COMPLETED';
+    booking.status = 'PAYMENT_COMPLETED';
+  }
+}
+
+await booking.save();
+
+// Create Rider Earning
+if (status === 'SERVICE_COMPLETED') {
+  const rider = await User.findById(req.user._id);
+
+  if (rider) {
+    const RiderEarning = (await import('../models/RiderEarning.js')).default;
+
+    const earningDate = new Date(booking.serviceCompletedAt || new Date());
+    earningDate.setHours(0, 0, 0, 0);
+
+    let earningAmount = 0;
+    let description = '';
+
+    if (rider.riderEarningMode === 'PER_RIDE_FIXED') {
+      earningAmount = Number(rider.riderEarningValue || 0);
+
+      description = `Fixed earning for ride ${booking.bookingId}`;
+    }
+
+    if (rider.riderEarningMode === 'PERCENTAGE') {
+      earningAmount =
+        (Number(booking.totalAmount || 0) *
+          Number(rider.riderEarningValue || 0)) /
+        100;
+
+      description = `${rider.riderEarningValue}% share from booking ${booking.bookingId}`;
+    }
+
+    if (rider.riderEarningMode === 'DAILY_FIXED') {
+      const existingDailyEarning = await RiderEarning.findOne({
+        rider: rider._id,
+        earningDate,
+        mode: 'DAILY_FIXED'
+      });
+
+      if (!existingDailyEarning) {
+        earningAmount = Number(rider.riderEarningValue || 0);
+
+        description = `Daily fixed earning for ${earningDate.toLocaleDateString()}`;
       }
     }
 
-    await booking.save();
+    if (earningAmount > 0) {
+      await RiderEarning.create({
+        rider: rider._id,
+        booking: booking._id,
+        bookingId: booking.bookingId,
+        earningDate,
+        mode: rider.riderEarningMode,
+        bookingAmount: booking.totalAmount,
+        earningAmount,
+        percentage:
+          rider.riderEarningMode === 'PERCENTAGE'
+            ? rider.riderEarningValue
+            : 0,
+        description
+      });
+    }
+  }
+}
 
     // Multilingual Notification for Farmer
     const statusMessages = {
