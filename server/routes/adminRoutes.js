@@ -9,6 +9,7 @@ import {
   deleteRider,
   deleteTractor,
   updateRider,
+  updateTractor,
   updateSettings
 } from '../controllers/adminController.js';
 import { protect, authorize } from '../middleware/auth.js';
