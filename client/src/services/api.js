@@ -168,11 +168,18 @@ getRiderEarningsByDate: (date) =>
     }).then(handleResponse),
 
   createRider: (riderData) =>
-    fetch(`${BASE_URL}/api/admin/riders`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(riderData)
-    }).then(handleResponse),
+  fetch(`${BASE_URL}/api/admin/riders`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(riderData)
+  }).then(handleResponse),
+
+ updateRider: (riderId, riderData) =>
+  fetch(`${BASE_URL}/api/admin/riders/${riderId}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(riderData)
+  }).then(handleResponse),
   deleteRider: (riderId) =>
     fetch(`${BASE_URL}/api/admin/riders/${riderId}`, {
       method: 'DELETE',
