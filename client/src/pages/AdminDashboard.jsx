@@ -702,20 +702,30 @@ const handleDeleteTractor = async (tractor) => {
     </div>
 
     <div className="flex items-center gap-2 shrink-0">
-      <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-100 text-emerald-800">
-        Active Pilot
-      </span>
+  <span className="px-2 py-0.5 text-[10px] font-bold rounded bg-emerald-100 text-emerald-800">
+    Active Driver
+  </span>
 
-      <button
-        type="button"
-        onClick={() => handleDeleteRider(r)}
-        className="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
-        title="Delete Rider"
-        aria-label={`Delete rider ${r.name}`}
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
-    </div>
+  <button
+    type="button"
+    onClick={() => handleEditRider(r)}
+    className="p-2 rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition"
+    title="Edit Rider"
+    aria-label={`Edit rider ${r.name}`}
+  >
+    <Edit className="w-4 h-4" />
+  </button>
+
+  <button
+    type="button"
+    onClick={() => handleDeleteRider(r)}
+    className="p-2 rounded-lg bg-red-100 text-red-700 hover:bg-red-200 transition"
+    title="Delete Rider"
+    aria-label={`Delete rider ${r.name}`}
+  >
+    <Trash2 className="w-4 h-4" />
+  </button>
+</div>
   </div>
 ))}
             </div>
