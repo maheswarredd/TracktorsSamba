@@ -50,13 +50,28 @@ const userSchema = new mongoose.Schema(
       ref: 'Tractor'
     },
     isAvailable: {
-      type: Boolean,
-      default: true
-    },
-    isActive: {
-      type: Boolean,
-      default: true
-    },
+  type: Boolean,
+  default: true
+},
+isActive: {
+  type: Boolean,
+  default: true
+},
+
+// Rider earning configuration
+riderEarningMode: {
+  type: String,
+  enum: ['PER_RIDE_FIXED', 'DAILY_FIXED', 'PERCENTAGE'],
+  default: 'PER_RIDE_FIXED'
+},
+
+riderEarningValue: {
+  type: Number,
+  default: 0,
+  min: 0
+},
+
+// Browser Push API subscriptions for each signed-in device/browser.
     // Browser Push API subscriptions for each signed-in device/browser.
     pushSubscriptions: [{
       endpoint: { type: String, required: true },
