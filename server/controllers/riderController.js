@@ -32,8 +32,7 @@ export const getRiderBookings = async (req, res) => {
     const completedBookings = allRiderBookings.filter(b => {
       return ['SERVICE_COMPLETED', 'PAYMENT_COMPLETED', 'CLOSED'].includes(b.status);
     });
-
-    res.json({
+       res.json({
       success: true,
       data: {
         todays: todaysBookings,
@@ -46,6 +45,162 @@ export const getRiderBookings = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// =====================================================
+// RIDER EARNINGS DASHBOARD
+// =====================================================
+
+// @desc    Get rider earnings dashboard
+// @route   GET /api/rider/earnings
+// @access  Private (Rider)
+export const getRiderEarnings = async (req, res) => {
+  try {
+    const riderId = req.user._id;
+
+    const earnings = await RiderEarning.find({
+      rider: riderId
+    })
+      .populate({
+        path: 'booking',
+        select:
+          'bookingId farmerName farmerPhone totalAmount serviceSnapshot quantity unit bookingDate timeSlot farmLocation status'
+      })
+      .sort({
+        earningDate: -1,
+        createdAt: -1
+      });
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const weekStart = new Date(today);
+    weekStart.setDate(
+      weekStart.getDate() - weekStart.getDay()
+    );
+
+    const monthStart = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      1
+    );
+
+    const todayEarnings = earnings.filter(
+      e =>
+        e.earningDate >= today &&
+        e.earningDate < tomorrow
+    );
+
+    const weeklyEarnings = earnings.filter(
+      e => e.earningDate >= weekStart
+    );
+
+    const monthlyEarnings = earnings.filter(
+      e => e.earningDate >= monthStart
+    );
+
+    const sum = list =>
+      list.reduce(
+        (total, item) =>
+          total + Number(item.earningAmount || 0),
+        0
+      );
+
+    res.json({
+      success: true,
+
+      data: {
+        today: {
+          amount: sum(todayEarnings),
+          rides: todayEarnings.length
+        },
+
+        weekly: {
+          amount: sum(weeklyEarnings),
+          rides: weeklyEarnings.length
+        },
+
+        monthly: {
+          amount: sum(monthlyEarnings),
+          rides: monthlyEarnings.length
+        },
+
+        total: {
+          amount: sum(earnings),
+          rides: earnings.length
+        },
+
+        earnings
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+export const getRiderEarningsByDate = async (req, res) => {
+  try {
+    const { date } = req.query;
+
+    if (!date) {
+      return res.status(400).json({
+        success: false,
+        message: 'Date is required'
+      });
+    }
+
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    const earnings = await RiderEarning.find({
+      rider: req.user._id,
+      earningDate: {
+        $gte: start,
+        $lt: end
+      }
+    })
+      .populate({
+        path: 'booking',
+        select:
+          'bookingId farmerName farmerPhone totalAmount serviceSnapshot quantity unit bookingDate timeSlot farmLocation status'
+      })
+      .sort({ createdAt: -1 });
+
+    const total = earnings.reduce(
+      (sum, item) => sum + Number(item.earningAmount || 0),
+      0
+    );
+
+    res.json({
+      success: true,
+      data: {
+        date,
+        total,
+        rides: earnings.length,
+        earnings
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
+
+// @desc    Update booking workflow status by Rider
+// @route   PATCH /api/rider/bookings/:id/status
+// @access  Private (Rider)
+export const updateBookingStatusByRider = async (req, res) => {
+   
+
 
 // @desc    Update booking workflow status by Rider
 // @route   PATCH /api/rider/bookings/:id/status
