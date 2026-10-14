@@ -424,7 +424,54 @@ export const updateRider = async (req, res) => {
     });
   }
 };
+export const updateTractor = async (req, res) => {
+  try {
+    const {
+      name,
+      registrationNumber,
+      hp,
+      type,
+      status,
+      notes,
+      image
+    } = req.body;
 
+    const tractor = await Tractor.findById(req.params.id);
+
+    if (!tractor) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tractor not found'
+      });
+    }
+
+    tractor.name = name ?? tractor.name;
+    tractor.registrationNumber =
+      registrationNumber?.toUpperCase() ??
+      tractor.registrationNumber;
+
+    tractor.hp =
+      hp !== undefined ? Number(hp) : tractor.hp;
+
+    tractor.type = type ?? tractor.type;
+    tractor.status = status ?? tractor.status;
+    tractor.notes = notes ?? tractor.notes;
+    tractor.image = image ?? tractor.image;
+
+    await tractor.save();
+
+    res.json({
+      success: true,
+      message: 'Tractor updated successfully',
+      data: tractor
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 // @desc    Create new Tractor
 // @route   POST /api/admin/tractors
 // @access  Private (Admin)
