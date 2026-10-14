@@ -57,7 +57,9 @@ export const AdminDashboard = () => {
   email: '',
   phone: '',
   village: '',
-  password: ''
+  password: '',
+  riderEarningMode: 'PER_RIDE_FIXED',
+  riderEarningValue: 300
 });
   const [newTractor, setNewTractor] = useState({ name: '', registrationNumber: '', hp: 60 });
 
@@ -764,6 +766,42 @@ const handleDeleteTractor = async (tractor) => {
   value={newRider.password}
   onChange={(e) =>
     setNewRider({ ...newRider, password: e.target.value })
+  }
+  className="p-2 border rounded-xl"
+/>
+<select
+  value={newRider.riderEarningMode}
+  onChange={(e) =>
+    setNewRider({
+      ...newRider,
+      riderEarningMode: e.target.value
+    })
+  }
+  className="p-2 border rounded-xl"
+>
+  <option value="PER_RIDE_FIXED">
+    Fixed Amount Per Ride
+  </option>
+
+  <option value="DAILY_FIXED">
+    Fixed Daily Amount
+  </option>
+
+  <option value="PERCENTAGE">
+    Percentage Share
+  </option>
+</select>
+
+<input
+  type="number"
+  min="0"
+  placeholder="Earning Amount / Percentage"
+  value={newRider.riderEarningValue}
+  onChange={(e) =>
+    setNewRider({
+      ...newRider,
+      riderEarningValue: Number(e.target.value)
+    })
   }
   className="p-2 border rounded-xl"
 />
