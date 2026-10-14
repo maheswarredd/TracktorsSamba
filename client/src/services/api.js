@@ -118,11 +118,24 @@ export const api = {
 
   // Rider
   getRiderBookings: () =>
-    fetch(`${BASE_URL}/api/rider/bookings`, {
-      headers: getAuthHeaders()
-    }).then(handleResponse),
+  fetch(`${BASE_URL}/api/rider/bookings`, {
+    headers: getAuthHeaders()
+  }).then(handleResponse),
 
-  updateRiderStatus: (bookingId, status, note) =>
+getRiderEarnings: () =>
+  fetch(`${BASE_URL}/api/rider/earnings`, {
+    headers: getAuthHeaders()
+  }).then(handleResponse),
+
+getRiderEarningsByDate: (date) =>
+  fetch(
+    `${BASE_URL}/api/rider/earnings/date?date=${encodeURIComponent(date)}`,
+    {
+      headers: getAuthHeaders()
+    }
+  ).then(handleResponse),
+
+   updateRiderStatus: (bookingId, status, note) =>
     fetch(`${BASE_URL}/api/rider/bookings/${bookingId}/status`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
