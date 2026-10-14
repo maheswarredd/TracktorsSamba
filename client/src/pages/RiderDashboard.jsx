@@ -15,7 +15,12 @@ import {
   Clock,
   MapPin,
   Compass,
-  CheckCheck
+    CheckCheck,
+  Wallet,
+  CalendarDays,
+  TrendingUp,
+  IndianRupee,
+  BarChart3
 } from 'lucide-react';
 
 export const RiderDashboard = () => {
@@ -27,6 +32,17 @@ export const RiderDashboard = () => {
   const [data, setData] = useState({ todays: [], upcoming: [], completed: [] });
   const [loading, setLoading] = useState(true);
   const [selectedBookingForChat, setSelectedBookingForChat] = useState(null);
+  const [earnings, setEarnings] = useState({
+  today: { amount: 0, rides: 0 },
+  weekly: { amount: 0, rides: 0 },
+  monthly: { amount: 0, rides: 0 },
+  total: { amount: 0, rides: 0 },
+  earnings: []
+});
+
+const [earningDate, setEarningDate] = useState('');
+const [dateEarnings, setDateEarnings] = useState(null);
+const [earningLoading, setEarningLoading] = useState(false);
 
   const fetchRiderTasks = async () => {
     try {
@@ -41,9 +57,25 @@ export const RiderDashboard = () => {
       setLoading(false);
     }
   };
+  const fetchRiderEarnings = async () => {
+  try {
+    setEarningLoading(true);
+
+    const res = await api.getRiderEarnings();
+
+    if (res.success) {
+      setEarnings(res.data);
+    }
+  } catch (err) {
+    console.error('Failed to load rider earnings:', err);
+  } finally {
+    setEarningLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchRiderTasks();
+    fetchRiderEarnings();
   }, []);
 
   useEffect(() => {
@@ -58,25 +90,42 @@ export const RiderDashboard = () => {
   }, [socket]);
 
   // Update status (e.g., RIDER_ON_THE_WAY, ARRIVED, SERVICE_STARTED, SERVICE_COMPLETED)
-  const handleUpdateStatus = async (bookingId, status) => {
-    try {
-      await api.updateRiderStatus(bookingId, status);
-      fetchRiderTasks();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
+ const handleUpdateStatus = async (bookingId, status) => {
+  try {
+    await api.updateRiderStatus(bookingId, status);
+
+    await Promise.all([
+      fetchRiderTasks(),
+      fetchRiderEarnings()
+    ]);
+  } catch (err) {
+    alert(err.message);
+  }
+};
 
   // Collect cash confirmation
   const handleCollectCash = async (bookingId) => {
-    if (!window.confirm(language === 'te' ? 'నగదు చెల్లింపు తీసుకున్నట్లు నిర్ధారించాలా?' : 'Confirm cash collected from farmer?')) return;
-    try {
-      await api.collectCash(bookingId);
-      fetchRiderTasks();
-    } catch (err) {
-      alert(err.message);
-    }
-  };
+  if (
+    !window.confirm(
+      language === 'te'
+        ? 'నగదు చెల్లింపు తీసుకున్నట్లు నిర్ధారించాలా?'
+        : 'Confirm cash collected from farmer?'
+    )
+  ) {
+    return;
+  }
+
+  try {
+    await api.collectCash(bookingId);
+
+    await Promise.all([
+      fetchRiderTasks(),
+      fetchRiderEarnings()
+    ]);
+  } catch (err) {
+    alert(err.message);
+  }
+};
 
   const tasksToDisplay = data[activeTab] || [];
 
