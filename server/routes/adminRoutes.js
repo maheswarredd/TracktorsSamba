@@ -8,6 +8,7 @@ import {
   createTractor,
   deleteRider,
   deleteTractor,
+  updateRider,
   updateSettings
 } from '../controllers/adminController.js';
 import { protect, authorize } from '../middleware/auth.js';
@@ -23,6 +24,7 @@ router.post('/bookings/:id/assign', assignRiderAndTractor);
 router.get('/resources', getAdminResources);
 
 router.post('/riders', createRider);
+router.put('/riders/:id', updateRider);
 router.delete('/riders/:id', deleteRider);
 
 router.post('/tractors', createTractor);
