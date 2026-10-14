@@ -345,6 +345,85 @@ if (password.length < 12) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+// @desc    Update existing Rider
+// @route   PUT /api/admin/riders/:id
+// @access  Private (Admin)
+export const updateRider = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      phone,
+      village,
+      password,
+      riderEarningMode,
+      riderEarningValue,
+      isAvailable,
+      isActive
+    } = req.body;
+
+    const rider = await User.findOne({
+      _id: req.params.id,
+      role: 'rider'
+    });
+
+    if (!rider) {
+      return res.status(404).json({
+        success: false,
+        message: 'Rider not found'
+      });
+    }
+
+    rider.name = name ?? rider.name;
+
+    rider.email =
+      email?.toLowerCase() ?? rider.email;
+
+    rider.phone =
+      phone ?? rider.phone;
+
+    rider.village =
+      village ?? rider.village;
+
+    // Password is optional while editing
+    if (password && password.trim()) {
+      rider.password = password;
+    }
+
+    // Rider earning configuration
+    rider.riderEarningMode =
+      riderEarningMode ?? rider.riderEarningMode;
+
+    rider.riderEarningValue =
+      riderEarningValue !== undefined
+        ? Number(riderEarningValue)
+        : rider.riderEarningValue;
+
+    // Rider availability
+    if (isAvailable !== undefined) {
+      rider.isAvailable = isAvailable;
+    }
+
+    // Rider active/inactive status
+    if (isActive !== undefined) {
+      rider.isActive = isActive;
+    }
+
+    await rider.save();
+
+    res.json({
+      success: true,
+      message: 'Rider updated successfully',
+      data: rider
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};
 
 // @desc    Create new Tractor
 // @route   POST /api/admin/tractors
