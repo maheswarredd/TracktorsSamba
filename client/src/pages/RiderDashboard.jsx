@@ -15,7 +15,7 @@ import {
   Clock,
   MapPin,
   Compass,
-    CheckCheck,
+  CheckCheck,
   Wallet,
   CalendarDays,
   TrendingUp,
@@ -28,26 +28,35 @@ export const RiderDashboard = () => {
   const { t, language } = useLanguage();
   const { socket } = useSocket();
 
-  const [activeTab, setActiveTab] = useState('todays'); // 'todays', 'upcoming', 'completed'
-  const [data, setData] = useState({ todays: [], upcoming: [], completed: [] });
-  const [loading, setLoading] = useState(true);
-  const [selectedBookingForChat, setSelectedBookingForChat] = useState(null);
-  const [earnings, setEarnings] = useState({
-  today: { amount: 0, rides: 0 },
-  weekly: { amount: 0, rides: 0 },
-  monthly: { amount: 0, rides: 0 },
-  total: { amount: 0, rides: 0 },
-  earnings: []
-});
+  const [activeTab, setActiveTab] = useState('todays');
+  const [data, setData] = useState({
+    todays: [],
+    upcoming: [],
+    completed: []
+  });
 
-const [earningDate, setEarningDate] = useState('');
-const [dateEarnings, setDateEarnings] = useState(null);
-const [earningLoading, setEarningLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const [selectedBookingForChat, setSelectedBookingForChat] = useState(null);
+
+  const [earnings, setEarnings] = useState({
+    today: { amount: 0, rides: 0 },
+    weekly: { amount: 0, rides: 0 },
+    monthly: { amount: 0, rides: 0 },
+    total: { amount: 0, rides: 0 },
+    earnings: []
+  });
+
+  const [earningDate, setEarningDate] = useState('');
+  const [dateEarnings, setDateEarnings] = useState(null);
+  const [earningLoading, setEarningLoading] = useState(false);
 
   const fetchRiderTasks = async () => {
     try {
       setLoading(true);
+
       const res = await api.getRiderBookings();
+
       if (res.success) {
         setData(res.data);
       }
@@ -57,21 +66,46 @@ const [earningLoading, setEarningLoading] = useState(false);
       setLoading(false);
     }
   };
+
   const fetchRiderEarnings = async () => {
-  try {
-    setEarningLoading(true);
+    try {
+      setEarningLoading(true);
 
-    const res = await api.getRiderEarnings();
+      const res = await api.getRiderEarnings();
 
-    if (res.success) {
-      setEarnings(res.data);
+      if (res.success) {
+        setEarnings(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load rider earnings:', err);
+    } finally {
+      setEarningLoading(false);
     }
-  } catch (err) {
-    console.error('Failed to load rider earnings:', err);
-  } finally {
-    setEarningLoading(false);
-  }
-};
+  };
+
+  const handleDateEarnings = async (date) => {
+    if (!date) {
+      setEarningDate('');
+      setDateEarnings(null);
+      return;
+    }
+
+    try {
+      setEarningLoading(true);
+
+      const res = await api.getRiderEarningsByDate(date);
+
+      if (res.success) {
+        setEarningDate(date);
+        setDateEarnings(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load date earnings:', err);
+      alert(err.message);
+    } finally {
+      setEarningLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchRiderTasks();
@@ -80,84 +114,103 @@ const [earningLoading, setEarningLoading] = useState(false);
 
   useEffect(() => {
     if (!socket) return;
+
     const handleStatusUpdate = () => {
       fetchRiderTasks();
     };
+
     socket.on('booking_status_updated', handleStatusUpdate);
+
     return () => {
       socket.off('booking_status_updated', handleStatusUpdate);
     };
   }, [socket]);
 
-  // Update status (e.g., RIDER_ON_THE_WAY, ARRIVED, SERVICE_STARTED, SERVICE_COMPLETED)
- const handleUpdateStatus = async (bookingId, status) => {
-  try {
-    await api.updateRiderStatus(bookingId, status);
+  // Update status
+  const handleUpdateStatus = async (bookingId, status) => {
+    try {
+      await api.updateRiderStatus(bookingId, status);
 
-    await Promise.all([
-      fetchRiderTasks(),
-      fetchRiderEarnings()
-    ]);
-  } catch (err) {
-    alert(err.message);
-  }
-};
+      await Promise.all([
+        fetchRiderTasks(),
+        fetchRiderEarnings()
+      ]);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   // Collect cash confirmation
   const handleCollectCash = async (bookingId) => {
-  if (
-    !window.confirm(
-      language === 'te'
-        ? 'నగదు చెల్లింపు తీసుకున్నట్లు నిర్ధారించాలా?'
-        : 'Confirm cash collected from farmer?'
-    )
-  ) {
-    return;
-  }
+    if (
+      !window.confirm(
+        language === 'te'
+          ? 'నగదు చెల్లింపు తీసుకున్నట్లు నిర్ధారించాలా?'
+          : 'Confirm cash collected from farmer?'
+      )
+    ) {
+      return;
+    }
 
-  try {
-    await api.collectCash(bookingId);
+    try {
+      await api.collectCash(bookingId);
 
-    await Promise.all([
-      fetchRiderTasks(),
-      fetchRiderEarnings()
-    ]);
-  } catch (err) {
-    alert(err.message);
-  }
-};
+      await Promise.all([
+        fetchRiderTasks(),
+        fetchRiderEarnings()
+      ]);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   const tasksToDisplay = data[activeTab] || [];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-900 to-green-950 text-white p-6 sm:p-8 rounded-3xl shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
             🚜 Pilot & Rider Cockpit
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black">{user?.name}</h1>
+
+          <h1 className="text-2xl sm:text-3xl font-black">
+            {user?.name}
+          </h1>
+
           <p className="text-xs text-emerald-200 mt-0.5">
             Tractor Pilot • {user?.village || 'Godavari Operations Hub'} • Phone: {user?.phone}
           </p>
         </div>
 
         <div className="flex items-center gap-3">
+
           <div className="bg-emerald-800/80 px-4 py-2.5 rounded-2xl border border-emerald-600/40 text-center">
-            <span className="text-[10px] font-bold uppercase text-emerald-300 block">Today's Tasks</span>
-            <span className="text-xl font-black text-amber-300">{data.todays?.length || 0}</span>
+            <span className="text-[10px] font-bold uppercase text-emerald-300 block">
+              Today's Tasks
+            </span>
+
+            <span className="text-xl font-black text-amber-300">
+              {data.todays?.length || 0}
+            </span>
           </div>
+
           <div className="bg-emerald-800/80 px-4 py-2.5 rounded-2xl border border-emerald-600/40 text-center">
-            <span className="text-[10px] font-bold uppercase text-emerald-300 block">Completed</span>
-            <span className="text-xl font-black text-white">{data.completed?.length || 0}</span>
+            <span className="text-[10px] font-bold uppercase text-emerald-300 block">
+              Completed
+            </span>
+
+            <span className="text-xl font-black text-white">
+              {data.completed?.length || 0}
+            </span>
           </div>
+
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex border-b border-gray-200 gap-4 text-sm font-bold">
-              {/* Rider Earnings Dashboard */}
+      {/* Rider Earnings Dashboard */}
       <div className="space-y-5">
 
         <div className="flex items-center justify-between">
@@ -165,6 +218,7 @@ const [earningLoading, setEarningLoading] = useState(false);
             <h2 className="text-xl font-black text-gray-900">
               Earnings Dashboard
             </h2>
+
             <p className="text-xs text-gray-500">
               Track your daily, weekly and monthly earnings
             </p>
@@ -180,15 +234,16 @@ const [earningLoading, setEarningLoading] = useState(false);
               <span className="text-xs font-bold">
                 Today's Earnings
               </span>
+
               <IndianRupee className="w-5 h-5" />
             </div>
 
             <p className="text-3xl font-black mt-3">
-              ₹{earnings.today.amount.toLocaleString()}
+              ₹{Number(earnings.today?.amount || 0).toLocaleString()}
             </p>
 
             <p className="text-xs text-emerald-100 mt-1">
-              {earnings.today.rides} rides
+              {earnings.today?.rides || 0} rides
             </p>
           </div>
 
@@ -198,11 +253,11 @@ const [earningLoading, setEarningLoading] = useState(false);
             </span>
 
             <p className="text-2xl font-black text-gray-900 mt-3">
-              ₹{earnings.weekly.amount.toLocaleString()}
+              ₹{Number(earnings.weekly?.amount || 0).toLocaleString()}
             </p>
 
             <p className="text-xs text-gray-500 mt-1">
-              {earnings.weekly.rides} rides
+              {earnings.weekly?.rides || 0} rides
             </p>
           </div>
 
@@ -212,11 +267,11 @@ const [earningLoading, setEarningLoading] = useState(false);
             </span>
 
             <p className="text-2xl font-black text-gray-900 mt-3">
-              ₹{earnings.monthly.amount.toLocaleString()}
+              ₹{Number(earnings.monthly?.amount || 0).toLocaleString()}
             </p>
 
             <p className="text-xs text-gray-500 mt-1">
-              {earnings.monthly.rides} rides
+              {earnings.monthly?.rides || 0} rides
             </p>
           </div>
 
@@ -226,11 +281,11 @@ const [earningLoading, setEarningLoading] = useState(false);
             </span>
 
             <p className="text-2xl font-black text-emerald-700 mt-3">
-              ₹{earnings.total.amount.toLocaleString()}
+              ₹{Number(earnings.total?.amount || 0).toLocaleString()}
             </p>
 
             <p className="text-xs text-gray-500 mt-1">
-              {earnings.total.rides} earning records
+              {earnings.total?.rides || 0} earning records
             </p>
           </div>
 
@@ -254,83 +309,117 @@ const [earningLoading, setEarningLoading] = useState(false);
             <input
               type="date"
               value={earningDate}
-              onChange={(e) =>
-                handleDateEarnings(e.target.value)
-              }
+              onChange={(e) => handleDateEarnings(e.target.value)}
               className="border border-gray-300 rounded-xl px-3 py-2 text-sm font-semibold"
             />
 
           </div>
 
+          {earningLoading && (
+            <div className="text-center py-4 text-xs text-gray-500">
+              Loading earnings...
+            </div>
+          )}
+
           {dateEarnings && (
             <div className="mt-5">
 
               <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 mb-4">
+
                 <div className="flex justify-between items-center">
+
                   <div>
                     <p className="text-xs text-emerald-700 font-bold">
                       Selected Date
                     </p>
+
                     <p className="text-lg font-black text-gray-900">
                       {dateEarnings.date}
                     </p>
                   </div>
 
                   <div className="text-right">
+
                     <p className="text-xs text-gray-500">
                       Earnings
                     </p>
+
                     <p className="text-2xl font-black text-emerald-700">
-                      ₹{dateEarnings.total.toLocaleString()}
+                      ₹{Number(dateEarnings.total || 0).toLocaleString()}
                     </p>
+
                   </div>
+
                 </div>
+
               </div>
 
               <div className="space-y-3">
 
-                {dateEarnings.earnings.map((earning) => (
-                  <div
-                    key={earning._id}
-                    className="border border-gray-100 rounded-2xl p-4 bg-gray-50"
-                  >
-                    <div className="flex justify-between gap-3">
+                {dateEarnings.earnings?.length > 0 ? (
+                  dateEarnings.earnings.map((earning) => (
+                    <div
+                      key={earning._id}
+                      className="border border-gray-100 rounded-2xl p-4 bg-gray-50"
+                    >
 
-                      <div>
-                        <p className="font-black text-gray-900">
-                          #{earning.bookingId}
-                        </p>
+                      <div className="flex justify-between gap-3">
 
-                        <p className="text-xs text-gray-600 mt-1">
-                          Farmer: {earning.booking?.farmerName}
-                        </p>
+                        <div>
 
-                        <p className="text-xs text-gray-500">
-                          Service:{' '}
-                          {earning.booking?.serviceSnapshot?.name?.en}
-                        </p>
+                          <p className="font-black text-gray-900">
+                            #{earning.booking?.bookingId || 'N/A'}
+                          </p>
 
-                        <p className="text-xs text-gray-500">
-                          Order Amount: ₹
-                          {Number(
-                            earning.bookingAmount || 0
-                          ).toLocaleString()}
-                        </p>
-                      </div>
+                          <p className="text-xs text-gray-600 mt-1">
+                            Farmer: {earning.booking?.farmerName || 'N/A'}
+                          </p>
 
-                      <div className="text-right">
-                        <p className="text-lg font-black text-emerald-700">
-                          ₹{earning.earningAmount.toLocaleString()}
-                        </p>
+                          <p className="text-xs text-gray-500">
+                            Service:{' '}
+                            {earning.booking?.serviceSnapshot?.name?.[language] ||
+                              earning.booking?.serviceSnapshot?.name?.en ||
+                              'Tractor Service'}
+                          </p>
 
-                        <span className="text-[10px] font-bold uppercase text-gray-500">
-                          {earning.mode.replaceAll('_', ' ')}
-                        </span>
+                          <p className="text-xs text-gray-500">
+                            Order Amount: ₹
+                            {Number(
+                              earning.bookingAmount ||
+                              earning.booking?.totalAmount ||
+                              0
+                            ).toLocaleString()}
+                          </p>
+
+                          {earning.booking?.farmLocation?.address && (
+                            <p className="text-xs text-gray-500 mt-1">
+                              Location: {earning.booking.farmLocation.address}
+                            </p>
+                          )}
+
+                        </div>
+
+                        <div className="text-right">
+
+                          <p className="text-lg font-black text-emerald-700">
+                            ₹{Number(earning.earningAmount || 0).toLocaleString()}
+                          </p>
+
+                          <span className="text-[10px] font-bold uppercase text-gray-500">
+                            {(earning.mode || 'EARNING').replaceAll('_', ' ')}
+                          </span>
+
+                        </div>
+
                       </div>
 
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-sm text-gray-400">
+                    No earnings found for this date.
                   </div>
-                ))}
+                )}
 
               </div>
 
@@ -343,11 +432,25 @@ const [earningLoading, setEarningLoading] = useState(false);
 
       {/* Tabs */}
       <div className="flex border-b border-gray-200 gap-4 text-sm font-bold">
+
         {[
-          { key: 'todays', label: t('rider.todaysTasks'), count: data.todays?.length || 0 },
-          { key: 'upcoming', label: t('rider.upcoming'), count: data.upcoming?.length || 0 },
-          { key: 'completed', label: t('rider.completed'), count: data.completed?.length || 0 }
+          {
+            key: 'todays',
+            label: t('rider.todaysTasks'),
+            count: data.todays?.length || 0
+          },
+          {
+            key: 'upcoming',
+            label: t('rider.upcoming'),
+            count: data.upcoming?.length || 0
+          },
+          {
+            key: 'completed',
+            label: t('rider.completed'),
+            count: data.completed?.length || 0
+          }
         ].map((tab) => (
+
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
@@ -357,61 +460,102 @@ const [earningLoading, setEarningLoading] = useState(false);
                 : 'border-transparent text-gray-500 hover:text-gray-900'
             }`}
           >
+
             <span>{tab.label}</span>
+
             <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 font-normal">
               {tab.count}
             </span>
+
           </button>
+
         ))}
+
       </div>
 
       {/* Task Cards */}
       {loading ? (
-        <div className="text-center py-20 text-gray-400 text-sm">{t('common.loading')}</div>
-      ) : tasksToDisplay.length === 0 ? (
-        <div className="bg-white p-12 rounded-3xl border border-gray-200 text-center space-y-2">
-          <Clock className="w-12 h-12 text-gray-300 mx-auto" />
-          <p className="text-xs text-gray-500">{t('rider.noTasks')}</p>
+
+        <div className="text-center py-20 text-gray-400 text-sm">
+          {t('common.loading')}
         </div>
+
+      ) : tasksToDisplay.length === 0 ? (
+
+        <div className="bg-white p-12 rounded-3xl border border-gray-200 text-center space-y-2">
+
+          <Clock className="w-12 h-12 text-gray-300 mx-auto" />
+
+          <p className="text-xs text-gray-500">
+            {t('rider.noTasks')}
+          </p>
+
+        </div>
+
       ) : (
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
           {tasksToDisplay.map((b) => {
+
             const serviceName = b.serviceSnapshot?.name
-              ? (b.serviceSnapshot.name[language] || b.serviceSnapshot.name.en)
+              ? (
+                  b.serviceSnapshot.name[language] ||
+                  b.serviceSnapshot.name.en
+                )
               : 'Tractor Service';
 
             const timeSlotLabel = b.timeSlotLabel
-              ? (b.timeSlotLabel[language] || b.timeSlotLabel.en)
+              ? (
+                  b.timeSlotLabel[language] ||
+                  b.timeSlotLabel.en
+                )
               : b.timeSlot;
 
-            const googleMapsNavUrl = `https://www.google.com/maps/dir/?api=1&destination=${b.farmLocation?.latitude},${b.farmLocation?.longitude}`;
+            const googleMapsNavUrl =
+              `https://www.google.com/maps/dir/?api=1&destination=${b.farmLocation?.latitude},${b.farmLocation?.longitude}`;
 
             return (
+
               <div
                 key={b._id}
                 className="bg-white rounded-3xl border border-emerald-100 shadow-md p-6 space-y-5 flex flex-col justify-between"
               >
+
                 <div className="space-y-4">
+
                   {/* Card Header */}
                   <div className="flex items-center justify-between pb-3 border-b border-gray-100">
+
                     <div>
+
                       <span className="font-mono text-xs font-bold text-gray-400">
                         #{b.bookingId}
                       </span>
+
                       <h3 className="text-base font-black text-gray-900 mt-0.5">
                         {serviceName}
                       </h3>
+
                     </div>
+
                     <span className="px-2.5 py-1 text-xs font-black rounded-lg bg-emerald-100 text-emerald-800 uppercase">
                       {t(`statuses.${b.status}`) || b.status}
                     </span>
+
                   </div>
 
                   {/* Farmer Contact Info */}
                   <div className="bg-gray-50 p-4 rounded-2xl space-y-2 text-xs">
+
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-sm text-gray-900">{b.farmerName}</span>
+
+                      <span className="font-bold text-sm text-gray-900">
+                        {b.farmerName}
+                      </span>
+
                       <div className="flex items-center gap-2">
+
                         <a
                           href={`tel:${b.farmerPhone}`}
                           className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-3 py-1.5 rounded-xl flex items-center gap-1 shadow-sm transition"
@@ -419,6 +563,7 @@ const [earningLoading, setEarningLoading] = useState(false);
                           <PhoneCall className="w-3.5 h-3.5" />
                           <span>{t('rider.callFarmer')}</span>
                         </a>
+
                         <button
                           onClick={() => setSelectedBookingForChat(b)}
                           className="bg-white hover:bg-gray-100 text-gray-800 font-bold px-3 py-1.5 rounded-xl border border-gray-300 flex items-center gap-1"
@@ -426,55 +571,97 @@ const [earningLoading, setEarningLoading] = useState(false);
                           <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
                           <span>{t('rider.chatFarmer')}</span>
                         </button>
+
                       </div>
+
                     </div>
-                    <p className="text-gray-500">Phone: {b.farmerPhone}</p>
-                    <p className="text-emerald-700 font-semibold">
-                      Quantity: {b.quantity} {b.unit}s • Total: ₹{b.totalAmount?.toLocaleString()} ({b.paymentMethod})
+
+                    <p className="text-gray-500">
+                      Phone: {b.farmerPhone}
                     </p>
+
+                    <p className="text-emerald-700 font-semibold">
+                      Quantity: {b.quantity} {b.unit}s • Total: ₹
+                      {b.totalAmount?.toLocaleString()} ({b.paymentMethod})
+                    </p>
+
                   </div>
 
                   {/* Farm GPS & Landmark Details */}
                   <div className="space-y-1.5 text-xs">
+
                     <div className="flex items-start gap-1.5 text-gray-800 font-medium">
+
                       <MapPin className="w-4 h-4 text-rose-500 flex-shrink-0 mt-0.5" />
-                      <span>{b.farmLocation?.address}</span>
+
+                      <span>
+                        {b.farmLocation?.address}
+                      </span>
+
                     </div>
 
                     {b.farmLocation?.landmark && (
                       <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-900">
-                        <span className="font-bold">🚩 {t('rider.landmark')}: </span>
-                        <span>{b.farmLocation.landmark}</span>
+
+                        <span className="font-bold">
+                          🚩 {t('rider.landmark')}:
+                        </span>
+
+                        <span>
+                          {b.farmLocation.landmark}
+                        </span>
+
                       </div>
                     )}
 
                     {b.farmLocation?.locationInstructions && (
                       <div className="p-2.5 bg-blue-50 border border-blue-200 rounded-xl text-blue-900">
-                        <span className="font-bold">🧭 {t('rider.instructions')}: </span>
-                        <span>{b.farmLocation.locationInstructions}</span>
+
+                        <span className="font-bold">
+                          🧭 {t('rider.instructions')}:
+                        </span>
+
+                        <span>
+                          {b.farmLocation.locationInstructions}
+                        </span>
+
                       </div>
                     )}
+
                   </div>
+
                 </div>
 
                 {/* Actions & Workflow Buttons */}
                 <div className="pt-4 border-t border-gray-100 space-y-3">
-                  {/* Google Maps Rapido Navigation Button */}
+
+                  {/* Google Maps Navigation Button */}
                   <a
                     href={googleMapsNavUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 rounded-2xl flex items-center justify-center gap-2 shadow-md transition"
                   >
+
                     <Navigation className="w-4 h-4 fill-white" />
-                    <span>{t('rider.navToFarm')}</span>
+
+                    <span>
+                      {t('rider.navToFarm')}
+                    </span>
+
                   </a>
 
                   {/* Status Progression Controls */}
                   <div className="grid grid-cols-2 gap-2">
+
                     {b.status === 'RIDER_ASSIGNED' && (
                       <button
-                        onClick={() => handleUpdateStatus(b._id, 'RIDER_ON_THE_WAY')}
+                        onClick={() =>
+                          handleUpdateStatus(
+                            b._id,
+                            'RIDER_ON_THE_WAY'
+                          )
+                        }
                         className="col-span-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs py-2.5 rounded-xl shadow transition"
                       >
                         🚜 Rider On The Way
@@ -483,7 +670,12 @@ const [earningLoading, setEarningLoading] = useState(false);
 
                     {b.status === 'RIDER_ON_THE_WAY' && (
                       <button
-                        onClick={() => handleUpdateStatus(b._id, 'ARRIVED')}
+                        onClick={() =>
+                          handleUpdateStatus(
+                            b._id,
+                            'ARRIVED'
+                          )
+                        }
                         className="col-span-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs py-2.5 rounded-xl shadow transition"
                       >
                         📍 Arrived at Farm Gate
@@ -492,52 +684,88 @@ const [earningLoading, setEarningLoading] = useState(false);
 
                     {b.status === 'ARRIVED' && (
                       <button
-                        onClick={() => handleUpdateStatus(b._id, 'SERVICE_STARTED')}
+                        onClick={() =>
+                          handleUpdateStatus(
+                            b._id,
+                            'SERVICE_STARTED'
+                          )
+                        }
                         className="col-span-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2"
                       >
+
                         <Play className="w-4 h-4 fill-white" />
-                        <span>{t('rider.startService')}</span>
+
+                        <span>
+                          {t('rider.startService')}
+                        </span>
+
                       </button>
                     )}
 
                     {b.status === 'SERVICE_STARTED' && (
                       <button
-                        onClick={() => handleUpdateStatus(b._id, 'SERVICE_COMPLETED')}
+                        onClick={() =>
+                          handleUpdateStatus(
+                            b._id,
+                            'SERVICE_COMPLETED'
+                          )
+                        }
                         className="col-span-2 bg-emerald-700 hover:bg-emerald-800 text-white font-black text-xs py-2.5 rounded-xl shadow transition flex items-center justify-center gap-2"
                       >
+
                         <CheckCheck className="w-4 h-4" />
-                        <span>{t('rider.completeService')}</span>
+
+                        <span>
+                          {t('rider.completeService')}
+                        </span>
+
                       </button>
                     )}
 
                     {/* Collect Cash Button for Offline payment */}
-                    {b.paymentMethod === 'OFFLINE' && b.paymentStatus !== 'COMPLETED' && ['SERVICE_STARTED', 'SERVICE_COMPLETED'].includes(b.status) && (
-                      <button
-                        onClick={() => handleCollectCash(b._id)}
-                        className="col-span-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 text-white font-black text-xs py-2.5 rounded-xl shadow flex items-center justify-center gap-1.5"
-                      >
-                        <Banknote className="w-4 h-4" />
-                        <span>{t('rider.collectCash')} (₹{b.totalAmount?.toLocaleString()})</span>
-                      </button>
-                    )}
-                   </div>
+                    {b.paymentMethod === 'OFFLINE' &&
+                      b.paymentStatus !== 'COMPLETED' &&
+                      ['SERVICE_STARTED', 'SERVICE_COMPLETED'].includes(b.status) && (
+
+                        <button
+                          onClick={() => handleCollectCash(b._id)}
+                          className="col-span-2 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 text-white font-black text-xs py-2.5 rounded-xl shadow flex items-center justify-center gap-1.5"
+                        >
+
+                          <Banknote className="w-4 h-4" />
+
+                          <span>
+                            {t('rider.collectCash')} (₹
+                            {b.totalAmount?.toLocaleString()})
+                          </span>
+
+                        </button>
+
+                      )}
+
+                  </div>
+
                 </div>
+
               </div>
-              </div>
+
             );
           })}
+
         </div>
+
       )}
 
-     {selectedBookingForChat && (
-  <ChatModal
-    isOpen={!!selectedBookingForChat}
-    onClose={() => setSelectedBookingForChat(null)}
-    bookingId={selectedBookingForChat._id}
-    recipientName={selectedBookingForChat.farmerName}
-  />
-)}
-</div>
+      {selectedBookingForChat && (
+        <ChatModal
+          isOpen={!!selectedBookingForChat}
+          onClose={() => setSelectedBookingForChat(null)}
+          bookingId={selectedBookingForChat._id}
+          recipientName={selectedBookingForChat.farmerName}
+        />
+      )}
+
+    </div>
   );
 };
 
