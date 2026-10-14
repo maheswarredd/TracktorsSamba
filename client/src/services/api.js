@@ -187,11 +187,18 @@ getRiderEarningsByDate: (date) =>
     }).then(handleResponse),
 
   createTractor: (tractorData) =>
-    fetch(`${BASE_URL}/api/admin/tractors`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(tractorData)
-    }).then(handleResponse),
+  fetch(`${BASE_URL}/api/admin/tractors`, {
+    method: 'POST',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(tractorData)
+  }).then(handleResponse),
+
+updateTractor: (tractorId, tractorData) =>
+  fetch(`${BASE_URL}/api/admin/tractors/${tractorId}`, {
+    method: 'PUT',
+    headers: getAuthHeaders(),
+    body: JSON.stringify(tractorData)
+  }).then(handleResponse),
   deleteTractor: (tractorId) =>
     fetch(`${BASE_URL}/api/admin/tractors/${tractorId}`, {
       method: 'DELETE',
