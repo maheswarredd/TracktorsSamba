@@ -211,6 +211,16 @@ updateTractor: (tractorId, tractorData) =>
       headers: getAuthHeaders(),
       body: JSON.stringify(settingsData)
     }).then(handleResponse),
+   // Telugu AI Assistant
+  askAIAssistant: (message, conversation = []) =>
+    fetch(`${BASE_URL}/api/ai-assistant`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        message,
+        conversation
+      })
+    }).then(handleResponse),
 
   // Chat
   getChatMessages: (bookingId) =>
