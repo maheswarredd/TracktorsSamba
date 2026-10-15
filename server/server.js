@@ -21,6 +21,7 @@ import chatRoutes from './routes/chatRoutes.js';
 import supportRoutes from './routes/supportRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import aiAssistantRoutes from './routes/aiAssistantRoutes.js';
 
 dotenv.config();
 
@@ -78,6 +79,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/ai-assistant', aiAssistantRoutes);
 
 // In production, serve frontend client build
 const clientDist = path.join(__dirname, '../client/dist');
