@@ -6,7 +6,7 @@ import Tractor from '../models/Tractor.js';
 import RiderEarning from '../models/RiderEarning.js';
 
 const GEMINI_API_URL =
-  'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
+  'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent';
 
 const SYSTEM_PROMPT = `
 You are the Telugu AI assistant for Samba Tractors.
