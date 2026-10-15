@@ -51,11 +51,13 @@ const TeluguAIAssistant = () => {
     useState('');
 
   const [pendingAction, setPendingAction] =
-    useState(null);
+  useState(null);
 
-  const [messages, setMessages] =
-    useState([]);
+const [bookingDraft, setBookingDraft] =
+  useState({});
 
+const [messages, setMessages] =
+  useState([]);
   const browserSupportsVoice =
     useMemo(
       () => Boolean(SpeechRecognition),
@@ -123,9 +125,16 @@ const TeluguAIAssistant = () => {
   };
 
   const executeAction = async (
-    action,
-    parameters = {}
-  ) => {
+  action,
+  parameters = {}
+) => {
+  const mergedParameters =
+    action === 'CREATE_BOOKING'
+      ? {
+          ...bookingDraft,
+          ...parameters
+        }
+      : parameters;
     switch (action) {
       case 'OPEN_BOOKING':
         navigate('/book');
@@ -153,25 +162,32 @@ const TeluguAIAssistant = () => {
             'బుకింగ్ చేయడానికి రైతు ఖాతాతో లాగిన్ అవ్వాలి.'
           );
         }
+         // Keep details collected in previous AI messages
+  // and merge the latest AI response into them.
+  const bookingParameters = {
+    ...bookingDraft,
+    ...parameters
+  };
 
-        const required = [
-          'serviceId',
-          'quantity',
-          'bookingDate',
-          'timeSlot',
-          'paymentMethod'
-        ];
 
-        const missing =
-          required.filter(
-            (key) => !parameters[key]
-          );
+       const required = [
+  'serviceId',
+  'quantity',
+  'bookingDate',
+  'timeSlot',
+  'paymentMethod'
+];
 
-        if (missing.length) {
-          throw new Error(
-            'బుకింగ్‌కు అవసరమైన కొన్ని వివరాలు ఇంకా లేవు.'
-          );
-        }
+const missing =
+  required.filter(
+    (key) => !parameters[key]
+  );
+
+if (missing.length) {
+  throw new Error(
+    'బుకింగ్‌కు అవసరమైన వివరాలు ఇంకా పూర్తిగా లేవు.'
+  );
+}
 
         let farmLocation =
           parameters.farmLocation;
@@ -455,6 +471,16 @@ const TeluguAIAssistant = () => {
 
       const result =
         res.data;
+      // Keep all booking information collected so far.
+if (
+  result.action === 'CREATE_BOOKING' &&
+  result.parameters
+) {
+  setBookingDraft((prev) => ({
+    ...prev,
+    ...result.parameters
+  }));
+}
 
       setMessages((prev) => [
         ...prev,
@@ -469,26 +495,25 @@ const TeluguAIAssistant = () => {
       );
 
       const confirmationActions =
-        new Set([
-          'CREATE_BOOKING',
-          'CANCEL_BOOKING',
-          'ASSIGN_RIDER_AND_TRACTOR',
-          'VERIFY_PAYMENT'
-        ]);
+  new Set([
+    'CANCEL_BOOKING',
+    'ASSIGN_RIDER_AND_TRACTOR',
+    'VERIFY_PAYMENT'
+  ]);
 
-      if (
-        (
-          result.requiresConfirmation ||
-          confirmationActions.has(
-            result.action
-          )
-        ) &&
-        result.action !== 'NONE'
-      ) {
-        setPendingAction(result);
-      } else if (
-        result.action !== 'NONE'
-      ) {
+if (
+  (
+    result.requiresConfirmation ||
+    confirmationActions.has(
+      result.action
+    )
+  ) &&
+  result.action !== 'NONE'
+) {
+  setPendingAction(result);
+} else if (
+  result.action !== 'NONE'
+) {
         try {
           const actionReply =
             await executeAction(
