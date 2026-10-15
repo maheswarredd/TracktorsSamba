@@ -12,9 +12,15 @@ import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
+import TeluguAIAssistant from './components/TeluguAIAssistant';
+import { useAuth } from './context/AuthContext';
 
 function App() {
+  const { isAuthenticated } = useAuth();
+
   return (
+
+
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans">
       <Navbar />
       <main className="flex-1">
@@ -54,8 +60,12 @@ function App() {
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </main>
+            </main>
       <Footer />
+
+      {isAuthenticated && (
+        <TeluguAIAssistant />
+      )}
     </div>
   );
 }
